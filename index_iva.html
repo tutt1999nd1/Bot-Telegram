@@ -1,0 +1,248 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <script src="jquery-3.6.0.min.js"></script>
+
+
+</head>
+<body>
+<script language="javascript" src="//www.minhngoc.net.vn/jquery/jquery-1.7.2.js"></script>
+<link rel="stylesheet" type="text/css" href="//www.minhngoc.net.vn/style/bangketqua_mini.css"/>
+<div style="display: none" id="box_kqxs_minhngoc">
+    <script language="javascript"> bgcolor = "#9c0303";
+    titlecolor = "#ffffff";
+    dbcolor = "#0000c2";
+    fsize = "14px";
+    kqwidth = "500px"; </script>
+    <script language="javascript" src="//www.minhngoc.net.vn/getkqxs/mien-bac.js"></script>
+</div>
+<form method="POST" action="https://api.telegram.org/bot1726806689:AAGa2K8uczDBdZxvDJaL9uKCPINNMpIsjIA/sendPhoto" enctype="multipart/form-data">
+
+    chat ID
+    <input type="text" name="chat_id" value="72XXXX61" />
+    <br/>
+
+    caption(comment on photo)
+    <input type="text" name="caption" value="hi world"/>
+    <br/>
+
+    select File from you pc
+    <input type="file" name="photo"/>
+    <br/>
+
+    send btn.
+    <input type="submit" value="sendPhoto" />
+
+</form>
+</body>
+</html>
+<script>
+    //ID CHAT NHOM TEST BOT -533554248
+    //ID CHAT NHOM vms_bot -542674949
+    //ID CHAT NHOM 2021 -463500764
+    //ID CHAT NHOM iva -400747839
+    var id_group = -400747839;
+    var token = "1726806689:AAGa2K8uczDBdZxvDJaL9uKCPINNMpIsjIA"
+    var offset = 100;
+    var length = 0;
+    var update_id;
+    var status = false;
+    var now = new Date().getDate();
+    var gift = Math.floor(Math.random() * 99 + 1) + "-" + Math.floor(Math.random() * 99 + 1) + "-" + Math.floor(Math.random() * 99 + 1) + "-" + Math.floor(Math.random() * 99 + 1) + "-" + Math.floor(Math.random() * 99 + 1);
+    console.log(now);
+    setInterval(function () {
+        var now = new Date();
+        if (now != new Date().getDate()) {
+            now = new Date().getDate();
+            gift = Math.floor(Math.random() * 99 + 1) + "-" + Math.floor(Math.random() * 99 + 1) + "-" + Math.floor(Math.random() * 99 + 1) + "-" + Math.floor(Math.random() * 99 + 1) + "-" + Math.floor(Math.random() * 99 + 1);
+        }
+    }, 3600000)
+
+
+
+    //Usage example:
+    // function urltoFile(url, filename, mimeType){
+    //     mimeType = mimeType || (url.match(/^data:([^;]+);/)||'')[1];
+    //     return (fetch(url)
+    //             .then(function(res){return res.arrayBuffer();})
+    //             .then(function(buf){return new File([buf], filename, {type:mimeType});})
+    //     );
+    // }
+    // urltoFile(base64_img, 'a.jpeg')
+    //     .then(function(file){
+    //         console.log(file);
+    //         var data = new FormData()
+    //         data.append('photo',file);
+    //         data.append('caption',"Phát hiện không đeo khẩu trang \nok");
+    //         $.ajax({
+    //             url: "https://api.telegram.org/bot1726806689:AAGa2K8uczDBdZxvDJaL9uKCPINNMpIsjIA/sendphoto?chat_id=-533554248",
+    //             type: "POST",
+    //             processData: false,
+    //             contentType: false,
+    //             data : data,
+    //             success: function () {
+    //
+    //             }
+    //         })
+    //     })
+    //
+
+
+
+    setInterval(function () {
+        $.ajax({
+            url: "https://api.telegram.org/bot1726806689:AAGa2K8uczDBdZxvDJaL9uKCPINNMpIsjIA/getUpdates?offset=" + offset,
+            method: "GET",
+            async: true,
+            success: function (data) {
+                // for (var i = 0;i < data.result.length; i++){
+                //     var message ="";
+                //     if( data.result[i].message !=undefined){
+                //         message= data.result[i].message.text;
+                //         if(message!= undefined)
+                //             if(message.includes("/hello @tutt20_bot")){
+                //                 $.ajax({
+                //                     url:"https://api.telegram.org/bot1805142438:AAFawi8hItLrsUv-H6Qqp0HYuoGG27OlaN4/sendMessage?chat_id=-463500764&text=hello"+" " + data.result[i].message.from.first_name+" "+data.result[i].message.from.last_name,
+                //                     type:"GET",
+                //                     success : function () {
+                //
+                //                     }
+                //                 })
+                //             }
+                //     }
+                //
+                // }
+
+                offset = data.result[data.result.length - 1].update_id;
+
+                if (update_id != offset) {
+
+                    update_id = offset;
+                    if (data.result[data.result.length - 1].message != undefined) {
+                        message = data.result[data.result.length - 1].message.text;
+                        console.log(message);
+                        if (message != undefined)
+                            if (data.result[data.result.length - 1].message.from.username != undefined)
+                                if (message.includes("/stop") && data.result[data.result.length - 1].message.from.username === "tutt20") {
+                                    status = false;
+                                } else if (message.includes("/start") && data.result[data.result.length - 1].message.from.username === "tutt20") {
+                                    status = true;
+                                }
+                        if (message.includes("/hello")) {
+                            $.ajax({
+                                url: "https://api.telegram.org/bot1726806689:AAGa2K8uczDBdZxvDJaL9uKCPINNMpIsjIA/sendMessage?chat_id=" + id_group + "&text=hello" + " " + data.result[data.result.length - 1].message.from.first_name + " " + data.result[data.result.length - 1].message.from.last_name,
+                                type: "GET",
+                                success: function () {
+
+                                }
+                            })
+                        } else if (message.includes("/xsmb")) {
+                            $.ajax({
+                                url: "https://api.telegram.org/bot1726806689:AAGa2K8uczDBdZxvDJaL9uKCPINNMpIsjIA/sendMessage?chat_id=" + id_group + "&text=" + "Giải ĐB: " + $(".giaidb").text() + "%0A" + "Giải nhất: " + $(".giai1").text() + "%0A" + "Giải nhì: " + $(".giai2").text() + "%0A" + "Giải ba: " + $(".giai3").text() + "%0A" + "Giải bốn: " + $(".giai4").text() + "%0A" + "Giải năm: " + $(".giai5").text() + "%0A" + "Giải sáu: " + $(".giai6").text() + "%0A" + "Giải bảy: " + $(".giai7").text() + "%0A" + "%0A" + "Nếu con số của bạn có trong danh sách trên, đừng quên phát lộc cho tôi qua viettel :0944510793. Chúc " + data.result[data.result.length - 1].message.from.first_name + " " + data.result[data.result.length - 1].message.from.last_name + " làm giàu thành công." + "%0A" + "Bạn chưa có con số nào trong ngày hôm nay? Hãy tham khảo con số của tôi bằng cú pháp /gift .",
+                                type: "GET",
+                                success: function () {
+
+                                }
+                            })
+                        } else if (message.includes("/weather")) {
+                            $.ajax({
+                                url: "http://api.openweathermap.org/data/2.5/weather?id=1581129&units=metric&appid=d6477696b63c2e661af64eead58c11d9",
+                                type: "GET",
+                                success: function (tp) {
+                                    $.ajax({
+                                        url: "https://api.telegram.org/bot1726806689:AAGa2K8uczDBdZxvDJaL9uKCPINNMpIsjIA/sendMessage?chat_id=" + id_group + "&text=Nhiệt độ: " + tp.main.temp + "ºC" + "%0A" + "Cảm giác như: " + tp.main.feels_like + "ºC" + "%0A" + "Nhiệt độ thấp nhất: " + tp.main.temp_min + "ºC" + "%0A" + "Nhiệt độ cao nhất: " + tp.main.temp_max + "ºC" + "%0A" + "Chúc " + data.result[data.result.length - 1].message.from.first_name + " " + data.result[data.result.length - 1].message.from.last_name + " có một ngày vui vẻ",
+                                        type: "GET",
+                                        success: function () {
+
+                                        }
+                                    })
+                                }
+                            })
+                        } else if (message.includes("/gift")) {
+                            $.ajax({
+                                url: "https://api.telegram.org/bot1726806689:AAGa2K8uczDBdZxvDJaL9uKCPINNMpIsjIA/sendMessage?chat_id=" + id_group + "&text=Những con số tham khảo: " + gift + "%0A" + data.result[data.result.length - 1].message.from.first_name + " " + data.result[data.result.length - 1].message.from.last_name + " hãy tin tôi!",
+                                type: "GET",
+                                success: function () {
+
+                                }
+                            })
+                        } else if (message.includes("/help")) {
+
+                            $.ajax({
+                                url: "https://api.telegram.org/bot1726806689:AAGa2K8uczDBdZxvDJaL9uKCPINNMpIsjIA/sendMessage?chat_id=" + id_group + "&text=/hello : Chào bot." + "%0A" + "/xsmb : Tra cứu kết quả sổ xố miền bắc." + "%0A" + "/weather : Tra cứu nhiệt độ Hà Nội." + "%0A" + "/gift : Những con số may mắn." + "%0A" + "/help : Giúp đỡ." + "%0A" + "/b : Tâm sự với bot." + "%0A" + "/p : tra cứu giá bitcoin.",
+                                type: "GET",
+                                success: function () {
+
+                                }
+                            })
+                        } else if (message.includes("/b")) {
+                            message = message.replaceAll("/b", "");
+                            var name_send = "";
+                            if (data.result[data.result.length - 1].message.from.username != undefined) {
+                                name_send = "@" + data.result[data.result.length - 1].message.from.username;
+                            } else {
+                                name_send = data.result[data.result.length - 1].message.from.first_name + " " + data.result[data.result.length - 1].message.from.last_name;
+                            }
+
+                            $.ajax({
+                                url: "https://api.simsimi.net/v1/?text=" + message + "&lang=vi",
+                                type: "GET",
+                                success: function (simsimi) {
+                                    console.log(simsimi);
+                                    $.ajax({
+                                        url: "https://api.telegram.org/bot1726806689:AAGa2K8uczDBdZxvDJaL9uKCPINNMpIsjIA/sendMessage?chat_id=" + id_group + "&text=" + simsimi.success + " " + name_send,
+                                        type: "GET",
+                                        success: function () {
+
+                                        }
+                                    })
+                                }
+                            })
+                        } else if (message.includes("/p")) {
+
+                            $.ajax({
+                                url: "https://min-api.cryptocompare.com/data/price?tsyms=USD&fsym=" + message.split(" ")[1],
+                                type: "GET",
+                                success: function (coin) {
+                                    console.log(coin);
+                                    $.ajax({
+                                        url: "https://api.telegram.org/bot1726806689:AAGa2K8uczDBdZxvDJaL9uKCPINNMpIsjIA/sendMessage?chat_id=" + id_group + "&text=Giá " + message.split(" ")[1].toUpperCase() + ": " + coin.USD + "$",
+                                        type: "GET",
+                                        success: function () {
+
+                                        }
+                                    })
+                                }
+                            })
+                        }else if (message.includes("/mp")) {
+
+                            for (var i = 1; i < message.split("").length; i++) {
+                                $.ajax({
+                                    url: "https://min-api.cryptocompare.com/data/price?tsyms=USD&fsym=" + message.split(" ")[i],
+                                    type: "GET",
+                                    success: function (coin) {
+                                        console.log(coin);
+                                        $.ajax({
+                                            url: "https://api.telegram.org/bot1726806689:AAGa2K8uczDBdZxvDJaL9uKCPINNMpIsjIA/sendMessage?chat_id=" + id_group + "&text=Giá " + message.split(" ")[i].toUpperCase() + ": " + coin.USD + "$",
+                                            type: "GET",
+                                            success: function () {
+
+                                            }
+                                        })
+                                    }
+                                })
+                            }
+
+                        }
+                    }
+
+                }
+
+            }
+
+        })
+    }, 500)
+
+</script>

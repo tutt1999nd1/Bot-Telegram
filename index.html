@@ -12,11 +12,13 @@
 <script language="javascript" src="//www.minhngoc.net.vn/jquery/jquery-1.7.2.js"></script>
 <link rel="stylesheet" type="text/css" href="//www.minhngoc.net.vn/style/bangketqua_mini.css"/><div style="display: none" id="box_kqxs_minhngoc"><script language="javascript"> bgcolor="#9c0303";titlecolor="#ffffff";dbcolor="#0000c2";fsize="14px"; kqwidth="500px"; </script><script language="javascript" src="//www.minhngoc.net.vn/getkqxs/mien-bac.js"></script></div>
 </body>
+<input type="text" id="message">
+<button id="send">gửi</button>
 </html>
 <script>
     //ID CHAT NHOM TEST BOT -533554248
-    //ID CHAT NHOM 2021 -463500764
-    var id_group = -533554248;
+    //ID CHAT NHOM 2021 -1001522688951
+    var id_group = -1001522688951;
     var offset=100;
     var length=0;
     var update_id;
@@ -25,20 +27,25 @@
     var now = new Date().getDate();
     var gift = Math.floor(Math.random() * 99+1)+"-"+ Math.floor(Math.random() * 99+1)+"-"+ Math.floor(Math.random() * 99+1)+"-"+ Math.floor(Math.random() * 99+1)+"-"+ Math.floor(Math.random() * 99+1);
     console.log(now);
-    setInterval(function () {
-        var now = new Date();
-        if(now!=new Date().getDate()){
-            now = new Date().getDate();
-            gift = Math.floor(Math.random() * 99+1)+"-"+ Math.floor(Math.random() * 99+1)+"-"+ Math.floor(Math.random() * 99+1)+"-"+ Math.floor(Math.random() * 99+1)+"-"+ Math.floor(Math.random() * 99+1);
-        }
-    },3600000)
+
+    var time_xsmb;
+    var count_xsmb = 0;
+
+    $('#send').click(function () {
+        $.ajax({
+            url:"https://api.telegram.org/bot1805142438:AAFu9w37sborVNYmGR1xGJXkEDiQ76JgNU0/sendMessage?chat_id="+id_group+"&text=" + $('#message').val(),
+            type:"GET",
+            success : function () {
+
+            }
+        })
+    })
     setInterval(function () {
         $.ajax({
             url:"https://api.telegram.org/bot1805142438:AAFu9w37sborVNYmGR1xGJXkEDiQ76JgNU0/getUpdates?offset="+offset,
             method : "GET",
             async: true,
             success : function (data) {
-                console.log(data)
                 // for (var i = 0;i < data.result.length; i++){
                 //     var message ="";
                 //     if( data.result[i].message !=undefined){
@@ -64,8 +71,9 @@
                     update_id =offset;
                     if( data.result[data.result.length-1].message !=undefined){
                         message= data.result[data.result.length-1].message.text;
+                        console.log(message);
+
                         if(message!= undefined)
-                            console.log(message);
                         if(data.result[data.result.length-1].message.from.username!=undefined)
                             if(message.includes("/stop") && data.result[data.result.length-1].message.from.username ==="tutt20"){
                                 status =false;
@@ -119,7 +127,7 @@
                         else if(message.includes("/help")){
 
                             $.ajax({
-                                url:"https://api.telegram.org/bot1805142438:AAFu9w37sborVNYmGR1xGJXkEDiQ76JgNU0/sendMessage?chat_id="+id_group+"&text=/hello : Chào bot."+"%0A"+"/xsmb : Tra cứu kết quả sổ xố miền bắc."+"%0A" +"/weather : Tra cứu nhiệt độ Hà Nội."+"%0A"+"/gift : Những con số may mắn."+"%0A"+"/help : Giúp đỡ."+"%0A"+"/b : Tâm sự với bot.",
+                                url:"https://api.telegram.org/bot1805142438:AAFu9w37sborVNYmGR1xGJXkEDiQ76JgNU0/sendMessage?chat_id="+id_group+"&text=/hello : Chào bot."+"%0A"+"/xsmb : Tra cứu kết quả sổ xố miền bắc."+"%0A" +"/weather : Tra cứu nhiệt độ Hà Nội."+"%0A"+"/gift : Những con số may mắn."+"%0A"+"/help : Giúp đỡ."+"%0A"+"/b : Tâm sự với bot."+"%0A"+"/p : Tra cứu giá tiền ảo",
                                 type:"GET",
                                 success : function () {
 
@@ -143,6 +151,24 @@
                                     console.log(simsimi);
                                     $.ajax({
                                         url:"https://api.telegram.org/bot1805142438:AAFu9w37sborVNYmGR1xGJXkEDiQ76JgNU0/sendMessage?chat_id="+id_group+"&text="+simsimi.success+" "+name_send,
+                                        type:"GET",
+                                        success : function () {
+
+                                        }
+                                    })
+                                }
+                            })
+                        }
+                        else if (message.includes("/p") ){
+
+
+                            $.ajax({
+                                url:"https://min-api.cryptocompare.com/data/price?tsyms=USD&fsym="+message.split(" ")[1],
+                                type:"GET",
+                                success : function (coin) {
+                                    console.log(coin);
+                                    $.ajax({
+                                        url:"https://api.telegram.org/bot1805142438:AAFu9w37sborVNYmGR1xGJXkEDiQ76JgNU0/sendMessage?chat_id="+id_group+"&text=Giá "+message.split(" ")[1].toUpperCase()+": "+coin.USD+"$",
                                         type:"GET",
                                         success : function () {
 

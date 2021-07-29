@@ -1,0 +1,287 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <script language="javascript" src="//www.minhngoc.net.vn/jquery/jquery-1.7.2.js"></script>
+</head>
+<body>
+<select name="" id="api">
+    <option value="https://camera-api.demo.thinghub.vn">Demo</option>
+    <option value="https://camera-api.ioc.thinghub.vn">IOC</option>
+    <option value="https://camera-api.testiva.thinghub.vn">Test IVA</option>
+</select>
+<select name="" id="bot">
+    <option value="1928251471:AAGDw5E2208lC--G_J0fivJWB5hQSC_HUXI-542674949">Bot VMS</option>
+    <option value="1820660305:AAFI8MVzdq6ZyfTiQH4LrhRP35YzTWYvMw8-551249025">Bot Quảng Bình</option>
+    <option value="1917447086:AAG8yh8cUCOiUj7RhrbxUw_J0ky-pd0xiZc-593789490">Bot Long Biên</option>
+    <option value="1811170276:AAGr22RYuBw7ZzAdBhhTwpcmpy3NHNgOkr4-447312657">Bot Ninh Bình</option>
+    <option value="1829601097:AAFJgHC0T9wQUiv6i94jXynVQIBTQn3mkgQ-534816386">Bot Thái Nguyên</option>
+    <option value="1874777715:AAG3LpioGQZt8vlGgu0bYbMuF4pvIBodXjA-581133294">Bot Cao Bằng</option>
+    <option value="1706305012:AAGcAAqrj2fD1LcJd5CBTJNc1g2SMlf0v5Y-502087754">Bot Test</option>
+</select>
+    <input id="tk" type="text" placeholder="user">
+    <input id="mk" type="password" placeholder="pass">
+    <button id="login" onclick="login()">Login</button>
+    <button style="display:none;" id="alarm" onclick="openAlarm()">Open alarm</button>
+
+</body>
+<script>
+    var api_domain;
+    // var token_bot="1928251471:AAGDw5E2208lC--G_J0fivJWB5hQSC_HUXI";
+    // var id_group = "-542674949";
+    // var token_bot="1706305012:AAGcAAqrj2fD1LcJd5CBTJNc1g2SMlf0v5Y";
+    // var id_group = "-502087754";
+    var token_bot;
+    var id_group;
+    var site_id;
+    var site_name;
+    var token;
+    var user_id;
+    var list_camera = [];
+    var count_first = 0;
+    var send_tele = 1;
+    $('#api').on('change', function() {
+        if(this.value.includes("ioc")){
+
+        }else if(this.value.includes("demo")){
+            $("#tk").val("demo2020") ;
+            $("#mk").val("123456aA@") ;
+        }
+        else if(this.value.includes("testiva")){
+            $("#tk").val("vts") ;
+            $("#mk").val("123456aA@") ;
+        }
+    });
+    $('#bot').on('change', function() {
+        if($( "#bot option:selected" ).text().includes("VMS")){
+
+        }else if($( "#bot option:selected" ).text().includes("Quảng Bình")){
+            $("#tk").val("ioc_quangbinh") ;
+            $("#mk").val("123456aA@") ;
+        }
+        else if($( "#bot option:selected" ).text().includes("Long Biên")){
+            $("#tk").val("ioc_longbien") ;
+            $("#mk").val("123456aA@") ;
+        }
+        else if($( "#bot option:selected" ).text().includes("Ninh Bình")){
+            $("#tk").val("ioc_nbh") ;
+            $("#mk").val("123456aA@") ;
+        }
+        else if($( "#bot option:selected" ).text().includes("Thái Nguyên")){
+            $("#tk").val("ioc_thainguyen") ;
+            $("#mk").val("123456aA@") ;
+        }
+        else if($( "#bot option:selected" ).text().includes("Cao Bằng")){
+            $("#tk").val("ioc_thainguyen") ;
+            $("#mk").val("123456aA@") ;
+        }
+    });
+    document.addEventListener('keydown', function(event) {
+        if (event.ctrlKey &&  event.key === ';') {
+            alert("Bật thông báo tele")
+        }
+    });
+    function openAlarm() {
+        send_tele = 0;
+        alert("Bật thông báo tele");
+        listenData();
+    }
+
+    function login() {
+        var tk = $("#tk").val();
+        var mk = sha256($("#mk").val());
+        var info = $("#bot").val();
+        token_bot=info.split("-")[0];
+        id_group="-"+info.split("-")[1];
+        api_domain = $("#api").val();
+        $.ajax({
+            url:api_domain+"/api/login?action=login&password="+mk+"&username="+tk,
+            type:"GET",
+            async:false,
+            success: function (data) {
+                console.log(data);
+
+                if(data.success!=undefined){
+                    site_id = data.site.site_id;
+                    site_name = data.site.site_name;
+                    token = data.token;
+                    user_id = data.user_id;
+                    $("#alarm").css("display","block")
+                }
+                else alert("Tài khoản hoặc mật khẩu sai")
+
+            }
+        })
+    }
+    var date;
+    var count_pre=0;
+    function listenData(){
+        setInterval(function () {
+            if(send_tele ===0){
+                $.ajax({
+                    url: api_domain+"/api/cms_api/getCamera?&version=006&token="+token+"&site_id="+site_id,
+                    type: "GET",
+                    async:false,
+                    success: function (data) {
+                        if(data.CAMS_LIST!= undefined){
+                            if(list_camera.length == 0){
+                                list_camera = data.CAMS_LIST;
+                            }
+                            else if(list_camera.toString() != data.CAMS_LIST.toString()) {
+                                list_camera = data.CAMS_LIST;
+                            }
+                            var count_off=0;
+                            for(var i = 0; i< data.CAMS_LIST.length; i++){
+                                var cam = data.CAMS_LIST[i];
+                                if( cam.camera_status == "Offline"){
+                                    count_off++;
+                                }
+                            }
+                            if(count_off == data.CAMS_LIST.length && count_off !=count_pre){
+                                count_pre = count_off;
+                                $.ajax({
+                                    url: "https://api.telegram.org/bot"+token_bot+"/sendMessage?chat_id=" + id_group + "&text=Site ''"+site_name+"'':%0ATất cả các camera bị mất kết nối lúc "+new Date().toLocaleTimeString('vi-VN') + ' ' + new Date().toLocaleDateString('vi-VN')+"%0AVui lòng kiểm tra lại.",
+                                    type: "GET",
+                                    async:false,
+                                    success: function () {
+                                    }
+                                });
+                            }
+                            else
+                            for(var i = 0; i< data.CAMS_LIST.length; i++){
+                                var cam = data.CAMS_LIST[i];
+                                if( cam.camera_status == "Offline"){
+                                    var cam_check = list_camera.find(el => el.camera_id== cam.camera_id);
+                                    if (cam_check.camera_status == "Online" || count_first === 0 ){
+                                        date = new Date().toLocaleTimeString('vi-VN') + ' ' + new Date().toLocaleDateString('vi-VN');
+                                        $.ajax({
+                                            url: "https://api.telegram.org/bot"+token_bot+"/sendMessage?chat_id=" + id_group + "&text=Site ''"+site_name+"'':%0ACamera ''"+cam.postion+"'' bị mất kết nối lúc "+date+"%0AVui lòng kiểm tra lại.",
+                                            type: "GET",
+                                            async:false,
+                                            success: function () {
+                                            }
+                                        });
+                                    }
+
+                                }
+                            }
+                        }
+                    }
+                });
+                count_first =1;
+            }
+
+        },5000)
+
+    }
+    function sleep(ms) {
+        return new Promise(resolve => setTimeout(resolve, ms));
+    }
+    document.onkeydown=function(){
+        if(window.event.keyCode=='13'){
+            login()
+        }
+    }
+    function sha256(ascii) {
+        function rightRotate(value, amount) {
+            return (value >>> amount) | (value << (32 - amount));
+        }
+        ;
+
+        var mathPow = Math.pow;
+        var maxWord = mathPow(2, 32);
+        var lengthProperty = 'length';
+        var i, j; // Used as a counter across the whole file
+        var result = '';
+
+        var words = [];
+        var asciiBitLength = ascii[lengthProperty] * 8;
+
+        //* caching results is optional - remove/add slash from front of this line to toggle
+        // Initial hash value: first 32 bits of the fractional parts of the square roots of the first 8 primes
+        // (we actually calculate the first 64, but extra values are just ignored)
+        var hash = sha256.h = sha256.h || [];
+        // Round constants: first 32 bits of the fractional parts of the cube roots of the first 64 primes
+        var k = sha256.k = sha256.k || [];
+        var primeCounter = k[lengthProperty];
+        /*/
+         var hash = [], k = [];
+         var primeCounter = 0;
+         //*/
+
+        var isComposite = {};
+        for (var candidate = 2; primeCounter < 64; candidate++) {
+            if (!isComposite[candidate]) {
+                for (i = 0; i < 313; i += candidate) {
+                    isComposite[i] = candidate;
+                }
+                hash[primeCounter] = (mathPow(candidate, .5) * maxWord) | 0;
+                k[primeCounter++] = (mathPow(candidate, 1 / 3) * maxWord) | 0;
+            }
+        }
+
+        ascii += '\x80'; // Append Ƈ' bit (plus zero padding)
+        while (ascii[lengthProperty] % 64 - 56)
+            ascii += '\x00'; // More zero padding
+
+        for (i = 0; i < ascii[lengthProperty]; i++) {
+            j = ascii.charCodeAt(i);
+            if (j >> 8)
+                return; // ASCII check: only accept characters in range 0-255
+            words[i >> 2] |= j << ((3 - i) % 4) * 8;
+        }
+        words[words[lengthProperty]] = ((asciiBitLength / maxWord) | 0);
+        words[words[lengthProperty]] = (asciiBitLength);
+
+        // process each chunk
+        for (j = 0; j < words[lengthProperty]; ) {
+            var w = words.slice(j, j += 16); // The message is expanded into 64 words as part of the iteration
+            var oldHash = hash;
+            // This is now the undefinedworking hash", often labelled as variables a...g
+            // (we have to truncate as well, otherwise extra entries at the end accumulate
+            hash = hash.slice(0, 8);
+
+            for (i = 0; i < 64; i++) {
+                var i2 = i + j;
+                // Expand the message into 64 words
+                // Used below if
+                var w15 = w[i - 15], w2 = w[i - 2];
+
+                // Iterate
+                var a = hash[0], e = hash[4];
+                var temp1 = hash[7]
+                    + (rightRotate(e, 6) ^ rightRotate(e, 11) ^ rightRotate(e, 25)) // S1
+                    + ((e & hash[5]) ^ ((~e) & hash[6])) // ch
+                    + k[i]
+                    // Expand the message schedule if needed
+                    + (w[i] = (i < 16) ? w[i] : (
+                            w[i - 16]
+                            + (rightRotate(w15, 7) ^ rightRotate(w15, 18) ^ (w15 >>> 3)) // s0
+                            + w[i - 7]
+                            + (rightRotate(w2, 17) ^ rightRotate(w2, 19) ^ (w2 >>> 10)) // s1
+                        ) | 0
+                    );
+                // This is only used once, so *could* be moved below, but it only saves 4 bytes and makes things unreadble
+                var temp2 = (rightRotate(a, 2) ^ rightRotate(a, 13) ^ rightRotate(a, 22)) // S0
+                    + ((a & hash[1]) ^ (a & hash[2]) ^ (hash[1] & hash[2])); // maj
+
+                hash = [(temp1 + temp2) | 0].concat(hash); // We don't bother trimming off the extra ones, they're harmless as long as we're truncating when we do the slice()
+                hash[4] = (hash[4] + temp1) | 0;
+            }
+
+            for (i = 0; i < 8; i++) {
+                hash[i] = (hash[i] + oldHash[i]) | 0;
+            }
+        }
+
+        for (i = 0; i < 8; i++) {
+            for (j = 3; j + 1; j--) {
+                var b = (hash[i] >> (j * 8)) & 255;
+                result += ((b < 16) ? 0 : '') + b.toString(16);
+            }
+        }
+        return result;
+    };
+</script>
+</html>
